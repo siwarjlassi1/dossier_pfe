@@ -18,7 +18,7 @@ phases:
   post_build:
     commands:
       - echo Deploying CDK stacks...
-      - cdk deploy --all --require-approval never
+      - cdk deploy HpChatbotLambdaStack --require-approval never
 
 artifacts:
   files:
