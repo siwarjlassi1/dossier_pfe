@@ -1,0 +1,25 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.12
+
+    commands:
+      - echo Installing dependencies...
+      - npm install -g aws-cdk
+      - pip install -r requirements.txt
+
+  build:
+    commands:
+      - echo Synthesizing CDK...
+      - cdk synth
+
+  post_build:
+    commands:
+      - echo Deploying CDK stacks...
+      - cdk deploy --require-approval never
+
+artifacts:
+  files:
+    - '**/*'

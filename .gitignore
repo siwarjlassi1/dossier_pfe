@@ -8,3 +8,8 @@ __pycache__
 # CDK asset staging directory
 .cdk.staging
 cdk.out
+
+# ML / Layers
+layers/
+ML/models/
+*.pkl
