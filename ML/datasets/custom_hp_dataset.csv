@@ -1,0 +1,181 @@
+text,category
+"My HP printer cannot connect to the WiFi network even after restarting the router several times.",network
+"The laptop keeps disconnecting from the internet every few minutes.",network
+"I cannot connect my HP printer to the wireless network at home.",network
+"The WiFi connection on my computer is unstable and keeps dropping.",network
+"The Ethernet connection is not detected on my HP desktop computer.",network
+"The printer says network unavailable although the router is working correctly.",network
+"I am unable to access the internet after updating the network drivers.",network
+"The wireless printer cannot communicate with the laptop anymore.",network
+"My HP laptop cannot find any available WiFi networks nearby.",network
+"The internet speed becomes extremely slow whenever I connect the printer.",network
+"Le wifi de mon ordinateur HP ne fonctionne plus depuis hier.",network
+"Je n’arrive pas à connecter mon imprimante HP au réseau sans fil.",network
+"La connexion internet se coupe constamment sur mon laptop.",network
+"Le réseau n’est pas détecté par mon ordinateur portable.",network
+"Mon imprimante affiche une erreur de connexion réseau.",network
+"Impossible de connecter le PC au routeur wifi de la maison.",network
+"La connexion sans fil devient très lente après quelques minutes.",network
+"Le système ne détecte aucun réseau disponible.",network
+"Mon ordinateur perd la connexion internet de manière aléatoire.",network
+"Je ne peux plus utiliser internet sur mon ordinateur HP.",network
+"The screen remains completely black when I start the laptop.",hardware
+"My HP laptop overheats after only a few minutes of usage.",hardware
+"The printer makes strange noises during printing operations.",hardware
+"The keyboard of the laptop suddenly stopped working.",hardware
+"The battery drains extremely fast even when the laptop is idle.",hardware
+"My monitor flickers continuously after turning on the computer.",hardware
+"The charging port seems damaged and the laptop does not charge anymore.",hardware
+"The power button is not responding when I try to turn on the PC.",hardware
+"The fan inside the laptop is making a loud noise constantly.",hardware
+"The printer paper tray is stuck and cannot move properly.",hardware
+"L’écran de mon ordinateur reste noir au démarrage.",hardware
+"Le ventilateur du PC fait un bruit très fort.",hardware
+"La batterie de mon ordinateur se décharge rapidement.",hardware
+"Le clavier ne fonctionne plus correctement sur mon laptop.",hardware
+"Le bouton d’alimentation ne répond plus.",hardware
+"L’imprimante HP fait des bruits inhabituels pendant l’impression.",hardware
+"Le chargeur semble ne plus fonctionner correctement.",hardware
+"Le PC chauffe énormément après quelques minutes d’utilisation.",hardware
+"Le port USB de mon ordinateur ne détecte plus les périphériques.",hardware
+"L’écran scintille constamment après le démarrage.",hardware
+"The printer driver installation fails every time.",software
+"The HP Smart application crashes immediately after launch.",software
+"I receive a blue screen error after updating Windows.",software
+"The printer software freezes during configuration.",software
+"The application stops responding whenever I start printing.",software
+"The laptop cannot complete the operating system update.",software
+"I keep receiving software compatibility errors.",software
+"The installed drivers are corrupted and causing problems.",software
+"The printing software cannot detect the connected device.",software
+"The antivirus software blocks several important system functions.",software
+"Le pilote de l’imprimante ne veut pas s’installer.",software
+"Le logiciel HP Smart plante à chaque ouverture.",software
+"Je reçois un écran bleu après la mise à jour Windows.",software
+"Le système d’exploitation ne démarre plus correctement.",software
+"Le logiciel d’impression se bloque constamment.",software
+"Les pilotes semblent corrompus après la dernière mise à jour.",software
+"Le programme ne répond plus pendant l’impression.",software
+"Je rencontre des erreurs de compatibilité logicielle.",software
+"L’application HP ne détecte plus l’imprimante connectée.",software
+"Le système affiche des messages d’erreur logiciels fréquents.",software
+"The printer setup process is too complicated and I need assistance.",configuration
+"I need help configuring my HP printer for the first time.",configuration
+"The scanner settings are not configured correctly.",configuration
+"I cannot complete the installation process on my laptop.",configuration
+"The printer setup wizard stops before completion.",configuration
+"I need support to configure the wireless printing feature.",configuration
+"The initial configuration of the device keeps failing.",configuration
+"I cannot synchronize the printer settings with my computer.",configuration
+"The installation assistant requests unknown configuration parameters.",configuration
+"I need help setting up my new HP laptop.",configuration
+"Je n’arrive pas à configurer mon imprimante correctement.",configuration
+"J’ai besoin d’aide pour installer mon nouveau PC HP.",configuration
+"Le processus d’installation reste bloqué.",configuration
+"Impossible de terminer la configuration du scanner.",configuration
+"Les paramètres réseau de l’imprimante sont incorrects.",configuration
+"L’assistant d’installation ne fonctionne pas correctement.",configuration
+"Je ne comprends pas comment configurer l’impression sans fil.",configuration
+"La configuration initiale du produit échoue systématiquement.",configuration
+"Le logiciel demande des paramètres inconnus.",configuration
+"Je souhaite configurer mon imprimante sur plusieurs appareils.",configuration
+"The computer becomes extremely slow after startup.",performance
+"The printer takes too much time before starting the printing process.",performance
+"Applications load very slowly on the laptop.",performance
+"The system freezes whenever multiple programs are opened.",performance
+"The laptop performance decreased significantly after the update.",performance
+"The computer becomes unresponsive during normal usage.",performance
+"The printer queue processing is unusually slow.",performance
+"The operating system experiences frequent lag issues.",performance
+"The device takes several minutes to boot completely.",performance
+"The overall performance of the workstation is very poor.",performance
+"Mon ordinateur devient très lent après le démarrage.",performance
+"Le système se bloque lorsque plusieurs applications sont ouvertes.",performance
+"Les performances du laptop ont fortement diminué.",performance
+"L’imprimante prend beaucoup trop de temps pour imprimer.",performance
+"Le PC reste figé pendant plusieurs minutes.",performance
+"Le temps de démarrage est devenu très long.",performance
+"Le système ralentit fortement pendant l’utilisation.",performance
+"Les applications mettent beaucoup de temps à s’ouvrir.",performance
+"Le poste de travail est devenu presque inutilisable.",performance
+"Les performances globales sont très mauvaises.",performance
+"My product is still under warranty and I would like a replacement.",warranty
+"I want to request a refund for my defective HP printer.",warranty
+"The device stopped working during the warranty period.",warranty
+"I would like to know if my laptop is still covered by warranty.",warranty
+"The printer arrived damaged and I need a replacement.",warranty
+"I want to cancel my order and receive a refund.",warranty
+"The product warranty information is missing from my account.",warranty
+"The warranty claim process is taking too long.",warranty
+"I need assistance regarding product replacement conditions.",warranty
+"The refund has not been processed yet.",warranty
+"Mon ordinateur est encore sous garantie.",warranty
+"Je souhaite demander un remboursement pour mon imprimante.",warranty
+"Le produit est tombé en panne pendant la période de garantie.",warranty
+"Je veux annuler ma commande et obtenir un remboursement.",warranty
+"La garantie de mon laptop semble introuvable.",warranty
+"Je voudrais remplacer mon produit défectueux.",warranty
+"Le remboursement n’a toujours pas été effectué.",warranty
+"Le processus de garantie prend beaucoup trop de temps.",warranty
+"Je souhaite connaître les conditions de remplacement du produit.",warranty
+"Mon PC n’est plus sous garantie mais je veux vérifier les options disponibles.",warranty
+"The delivery of my printer is delayed by several days.",delivery
+"I received the wrong product in my package.",delivery
+"The package arrived damaged during transportation.",delivery
+"My order tracking information has not been updated.",delivery
+"The delivery address was ignored by the shipping company.",delivery
+"The printer accessories are missing from the box.",delivery
+"I never received my HP laptop order.",delivery
+"The shipment status has been stuck for days.",delivery
+"The package was delivered to the wrong address.",delivery
+"I am still waiting for my delivery confirmation email.",delivery
+"La livraison de mon imprimante est en retard.",delivery
+"Le colis est arrivé endommagé.",delivery
+"Je n’ai jamais reçu ma commande HP.",delivery
+"Le suivi de livraison ne se met plus à jour.",delivery
+"Le transporteur a livré le colis à une mauvaise adresse.",delivery
+"Des accessoires manquent dans la boîte du produit.",delivery
+"Le statut de la livraison reste bloqué depuis plusieurs jours.",delivery
+"Je suis toujours en attente de confirmation de livraison.",delivery
+"Le produit reçu n’est pas celui commandé.",delivery
+"La société de livraison n’a pas respecté l’adresse indiquée.",delivery
+"My payment was rejected even though my card is valid.",billing
+"I was charged twice for the same HP order.",billing
+"The invoice amount is incorrect on my account.",billing
+"I cannot complete the payment process online.",billing
+"The billing information displayed is inaccurate.",billing
+"The payment confirmation email was never received.",billing
+"There is an unexpected charge on my recent purchase.",billing
+"The transaction failed but the money was deducted.",billing
+"The system keeps declining my payment method.",billing
+"I need assistance regarding invoice correction.",billing
+"Le paiement de ma commande a été refusé.",billing
+"Le montant facturé est incorrect.",billing
+"J’ai été débité deux fois pour la même commande.",billing
+"La transaction a échoué mais l’argent a été retiré.",billing
+"Je ne peux pas finaliser le paiement en ligne.",billing
+"Les informations de facturation sont incorrectes.",billing
+"Je n’ai jamais reçu la confirmation de paiement.",billing
+"Le système refuse constamment ma carte bancaire.",billing
+"Je souhaite corriger ma facture.",billing
+"Des frais inattendus apparaissent sur ma commande.",billing
+"I would like recommendations for a gaming laptop.",inquiry
+"Which HP printer is best for office usage?",inquiry
+"I need information about compatible printer cartridges.",inquiry
+"Can you recommend a laptop suitable for programming?",inquiry
+"I want more details about HP warranty services.",inquiry
+"Which printer model supports wireless scanning?",inquiry
+"I need help choosing between two laptop models.",inquiry
+"Can you provide information about product specifications?",inquiry
+"I would like to know the differences between HP product ranges.",inquiry
+"What is the best laptop for graphic design?",inquiry
+"Je voudrais des recommandations pour un laptop gaming.",inquiry
+"Quelle imprimante HP est la meilleure pour le bureau ?",inquiry
+"J’ai besoin d’informations sur les cartouches compatibles.",inquiry
+"Pouvez-vous recommander un ordinateur pour la programmation ?",inquiry
+"Je souhaite connaître les différences entre plusieurs modèles HP.",inquiry
+"Quel laptop est recommandé pour le design graphique ?",inquiry
+"Je voudrais plus d’informations sur les services de garantie HP.",inquiry
+"Quelle imprimante prend en charge le scan sans fil ?",inquiry
+"J’ai besoin d’aide pour choisir entre deux ordinateurs.",inquiry
+"Pouvez-vous fournir les spécifications techniques du produit ?",inquiry

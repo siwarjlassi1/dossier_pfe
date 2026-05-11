@@ -1,0 +1,71 @@
+GUIDE DÉPANNAGE IMPRIMANTES HP
+
+=== PROBLÈMES GÉNÉRAUX ===
+
+PROBLÈME: Imprimante HP ne s'allume pas
+SOLUTION:
+1. Vérifiez le câble d'alimentation
+2. Essayez une autre prise électrique
+3. Maintenez le bouton power 3 secondes
+4. Réinitialisez l'imprimante (débranchez 60 secondes)
+URGENCE: URGENT
+
+PROBLÈME: Imprimante HP hors ligne
+SOLUTION:
+1. Vérifiez la connexion USB ou WiFi
+2. Redémarrez l'imprimante et l'ordinateur
+3. Supprimez et réinstallez l'imprimante
+4. Vérifiez le spouleur d'impression Windows
+5. Téléchargez les pilotes HP sur support.hp.com
+URGENCE: MODÉRÉ
+
+PROBLÈME: Bourrage papier
+SOLUTION:
+1. Éteignez l'imprimante
+2. Retirez délicatement le papier coincé
+3. Vérifiez qu'il ne reste aucun morceau
+4. Vérifiez l'alignement du papier dans le bac
+5. Rallumez et testez
+URGENCE: MODÉRÉ
+
+PROBLÈME: Qualité d'impression mauvaise
+SOLUTION:
+1. Lancez le nettoyage des têtes d'impression
+2. Alignez les cartouches depuis le logiciel HP
+3. Vérifiez le niveau d'encre
+4. Utilisez du papier HP recommandé
+5. Remplacez les cartouches si vides
+URGENCE: FAIBLE
+
+PROBLÈME: Imprimante HP ne se connecte pas au WiFi
+SOLUTION:
+1. Rapprochez l'imprimante du routeur
+2. Relancez l'assistant de configuration WiFi HP
+3. Vérifiez que le réseau est en 2.4GHz
+4. Réinitialisez les paramètres réseau imprimante
+5. Utilisez HP Smart pour reconfigurer
+URGENCE: MODÉRÉ
+
+=== NIVEAUX D'URGENCE ===
+
+CRITIQUE (Score 9-10):
+→ Risque de perte de données
+→ Matériel physiquement endommagé
+→ Surchauffe dangereuse
+→ Batterie gonflée
+Action: Escalade immédiate vers technicien HP
+
+URGENT (Score 7-8):
+→ PC/imprimante ne démarre plus
+→ Perte de fonctionnalité principale
+Action: Solution dans l'heure
+
+MODÉRÉ (Score 4-6):
+→ Fonctionnalité dégradée
+→ Problème de connectivité
+Action: Solution dans la journée
+
+FAIBLE (Score 1-3):
+→ Question générale
+→ Optimisation performance
+Action: FAQ self-service

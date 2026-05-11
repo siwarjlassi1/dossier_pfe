@@ -1,0 +1,74 @@
+GUIDE DE DÉPANNAGE HP ELITEBOOK
+
+=== HP ELITEBOOK 840 ===
+
+PROBLÈME: Écran noir au démarrage
+SOLUTION:
+1. Appuyez sur Fn + F4 pour changer source affichage
+2. Connectez un moniteur externe via HDMI
+3. Réinitialisez le BIOS: éteignez, retirez batterie,
+   maintenez power 15s, rebranchez
+4. Vérifiez la RAM (retirez et réinsérez les barrettes)
+URGENCE: CRITIQUE
+TEMPS RÉSOLUTION: 30 minutes
+
+PROBLÈME: Clavier ne répond pas
+SOLUTION:
+1. Redémarrez l'ordinateur
+2. Vérifiez dans gestionnaire de périphériques
+3. Mettez à jour les pilotes clavier HP
+4. Testez avec un clavier externe USB
+5. Réinitialisez les paramètres BIOS
+URGENCE: URGENT
+TEMPS RÉSOLUTION: 20 minutes
+
+PROBLÈME: Port USB ne fonctionne pas
+SOLUTION:
+1. Essayez un autre port USB
+2. Redémarrez l'ordinateur
+3. Vérifiez dans gestionnaire de périphériques
+4. Désinstallez et réinstallez les pilotes USB
+5. Vérifiez les paramètres d'alimentation USB
+URGENCE: MODÉRÉ
+TEMPS RÉSOLUTION: 15 minutes
+
+PROBLÈME: Son ne fonctionne pas
+SOLUTION:
+1. Vérifiez le volume (Fn + F9/F10/F11)
+2. Vérifiez que le son n'est pas coupé
+3. Vérifiez le périphérique audio par défaut
+4. Mettez à jour les pilotes audio HP
+5. Réinstallez les pilotes Realtek Audio
+URGENCE: FAIBLE
+TEMPS RÉSOLUTION: 10 minutes
+
+PROBLÈME: Lecteur d'empreintes ne fonctionne pas
+SOLUTION:
+1. Réenregistrez votre empreinte dans Windows Hello
+2. Mettez à jour les pilotes biométriques HP
+3. Vérifiez dans gestionnaire de périphériques
+4. Désactivez et réactivez le lecteur
+URGENCE: FAIBLE
+TEMPS RÉSOLUTION: 10 minutes
+
+=== HP ELITEBOOK 850 ===
+
+PROBLÈME: Surchauffe excessive
+SOLUTION:
+1. Nettoyez les ventilateurs avec air comprimé
+2. Changez la pâte thermique du processeur
+3. Vérifiez les paramètres d'alimentation
+4. Limitez les performances dans HP Command Center
+5. Contactez support si température > 95°C
+URGENCE: CRITIQUE si > 95°C
+TEMPS RÉSOLUTION: 1 heure
+
+PROBLÈME: Batterie ne tient pas plus de 2 heures
+SOLUTION:
+1. Calibrez la batterie complètement
+2. Activez le mode économie d'énergie HP
+3. Réduisez luminosité à 50%
+4. Désactivez fonctions non utilisées
+5. Remplacez batterie si > 500 cycles
+URGENCE: MODÉRÉ
+TEMPS RÉSOLUTION: 30 minutes

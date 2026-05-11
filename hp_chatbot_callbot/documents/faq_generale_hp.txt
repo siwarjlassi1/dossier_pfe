@@ -1,0 +1,99 @@
+FAQ GÉNÉRALE HP SUPPORT
+
+=== PROBLÈMES DE DÉMARRAGE ===
+
+Q: Mon ordinateur HP ne s'allume pas
+R: 
+1. Vérifiez que le câble d'alimentation est bien branché
+2. Retirez la batterie pendant 30 secondes
+3. Maintenez le bouton power appuyé 15 secondes
+4. Rebranchez la batterie et redémarrez
+5. Si le problème persiste, contactez le support HP
+Urgence: CRITIQUE
+
+Q: Mon ordinateur HP démarre mais reste bloqué
+R:
+1. Redémarrez en mode sans échec (F8 au démarrage)
+2. Lancez une analyse antivirus
+3. Vérifiez les mises à jour Windows
+4. Si bloqué sur logo HP, réinitialisez le BIOS (F10)
+Urgence: URGENT
+
+=== PROBLÈMES D'ÉCRAN ===
+
+Q: Mon écran HP est noir
+R:
+1. Vérifiez la luminosité (Fn + F2)
+2. Branchez un écran externe pour tester
+3. Retirez et rebranchez la batterie
+4. Vérifiez la connexion du câble écran
+5. Si rien ne fonctionne, carte graphique défectueuse
+Urgence: URGENT
+
+Q: Mon écran HP a des lignes ou des pixels morts
+R:
+1. Prenez une photo pour documenter
+2. Vérifiez si sous garantie HP
+3. Contactez le support HP pour remplacement
+4. Ne pas appuyer sur l'écran
+Urgence: MODÉRÉ
+
+=== PROBLÈMES DE BATTERIE ===
+
+Q: La batterie de mon HP ne charge plus
+R:
+1. Vérifiez le câble chargeur (signes de dommage)
+2. Essayez un autre chargeur HP compatible
+3. Mettez à jour les pilotes de batterie
+4. Calibrez la batterie (décharge complète puis recharge)
+5. Si batterie gonflée, ARRÊTEZ d'utiliser immédiatement
+Urgence: URGENT si gonflée, MODÉRÉ sinon
+
+Q: La batterie se décharge très vite
+R:
+1. Réduisez la luminosité de l'écran
+2. Désactivez le Bluetooth et WiFi si non utilisés
+3. Fermez les applications en arrière-plan
+4. Vérifiez les paramètres d'alimentation Windows
+5. Remplacez la batterie si plus de 2 ans
+Urgence: FAIBLE
+
+=== PROBLÈMES DE PERFORMANCE ===
+
+Q: Mon HP est très lent
+R:
+1. Redémarrez l'ordinateur
+2. Vérifiez l'espace disque (minimum 10% libre)
+3. Lancez le nettoyage de disque Windows
+4. Désactivez les programmes au démarrage
+5. Ajoutez de la RAM si possible
+6. Passez à un SSD si vous avez un HDD
+Urgence: FAIBLE
+
+Q: Mon HP surchauffe
+R:
+1. Nettoyez les ventilateurs (air comprimé)
+2. Utilisez sur surface dure et plane
+3. Vérifiez que les grilles d'aération ne sont pas bloquées
+4. Mettez à jour les pilotes de carte graphique
+5. Si température > 90°C, arrêtez immédiatement
+Urgence: CRITIQUE si > 90°C, MODÉRÉ sinon
+
+=== PROBLÈMES DE CONNECTIVITÉ ===
+
+Q: Mon WiFi HP ne fonctionne pas
+R:
+1. Vérifiez que le WiFi est activé (Fn + F12)
+2. Redémarrez le routeur
+3. Oubliez le réseau et reconnectez-vous
+4. Mettez à jour les pilotes WiFi
+5. Réinitialisez les paramètres réseau Windows
+Urgence: MODÉRÉ
+
+Q: Mon Bluetooth HP ne fonctionne pas
+R:
+1. Activez le Bluetooth dans les paramètres
+2. Redémarrez le service Bluetooth
+3. Mettez à jour les pilotes Bluetooth
+4. Supprimez et réappairez l'appareil
+Urgence: FAIBLE
