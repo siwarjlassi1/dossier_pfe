@@ -54,7 +54,7 @@ class AgentStack(Stack):
                 ],
                 resources=[
                     "arn:aws:bedrock:us-east-1::foundation-model/"
-                    "anthropic.claude-3-haiku-20240307-v1:0"
+                    "anthropic.claude-3-5-haiku-20241022-v1:0"
                 ]
             )
         )
@@ -199,7 +199,7 @@ class AgentStack(Stack):
             agent_name="hp-chatbot-agent",
             description="Agent IA HP pour chatbot et callbot",
             foundation_model=(
-                "anthropic.claude-3-haiku-20240307-v1:0"
+                "anthropic.claude-3-5-haiku-20241022-v1:0"
             ),
             instruction=agent_instruction,
             idle_session_ttl_in_seconds=1800,

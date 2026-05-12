@@ -40,7 +40,7 @@ class LambdaStack(Stack):
                 ],
                 resources=[
                     "arn:aws:bedrock:us-east-1:471112585335:knowledge-base/8DOMZOCGC2",
-                    "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-haiku-20240307-v1:0",
+                    "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-5-haiku-20241022-v1:0",
                     "*",
                 ]
             )
@@ -61,7 +61,7 @@ class LambdaStack(Stack):
                 "BEDROCK_AGENT_ALIAS_ID": "77RNRLMRAS",
                 "API_GATEWAY_URL":        api_url,
                 "KNOWLEDGE_BASE_ID":      "8DOMZOCGC2",
-                "BEDROCK_MODEL_ARN":      "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-haiku-20240307-v1:0",
+                "BEDROCK_MODEL_ARN":      "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-5-haiku-20241022-v1:0",
             },
         )
 
