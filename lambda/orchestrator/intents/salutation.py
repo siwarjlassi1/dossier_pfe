@@ -16,7 +16,7 @@ def handle_salutation(event):
                 {
                     "contentType": "ImageResponseCard",
                     "imageResponseCard": {
-                        "title": "Bonjour ! Comment puis-je vous aider aujourd'hui ?",
+                        "title": "Bonjour Cher client ! Comment puis-je vous aider aujourd'hui ?",
                         "subtitle": "Veuillez choisir un service :",
                         "buttons": [
                             {"text": "🛒 Commander un produit",  "value": "Je souhaite commander un produit"},
