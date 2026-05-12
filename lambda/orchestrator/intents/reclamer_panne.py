@@ -3,7 +3,6 @@ call_microservice = None
 import logging
 import boto3
 import os
-import joblib
 
 from .utils import (
     get_slot, elicit_slot, elicit_slot_with_buttons,
