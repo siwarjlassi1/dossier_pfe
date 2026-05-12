@@ -2,7 +2,6 @@
 call_microservice = None
 import logging
 import boto3
-import os
 
 from .utils import (
     get_slot, elicit_slot, elicit_slot_with_buttons,
@@ -15,15 +14,6 @@ comprehend = boto3.client("comprehend", region_name="us-east-1")
 
 logger = logging.getLogger()
 
-MODEL_DIR = os.path.join(os.path.dirname(__file__), "models")
-
-classifier = joblib.load(
-    os.path.join(MODEL_DIR, "complaint_classifier.pkl")
-)
-
-vectorizer = joblib.load(
-    os.path.join(MODEL_DIR, "tfidf_vectorizer.pkl")
-)
 
 def detect_sentiment(text: str) -> dict:
     """Détecte l'émotion du client via AWS Comprehend."""
@@ -40,20 +30,6 @@ def detect_sentiment(text: str) -> dict:
         logger.error(f"Comprehend error: {e}")
         return {"sentiment": "UNKNOWN", "sentiment_score": {}}
 
-
-def predict_problem_category(text: str) -> str:
-    """Prédit automatiquement la catégorie du problème."""
-    try:
-        text_tfidf = vectorizer.transform([text])
-        prediction = classifier.predict(text_tfidf)[0]
-
-        logger.info(f"Predicted category: {prediction}")
-
-        return prediction
-
-    except Exception as e:
-        logger.error(f"ML prediction error: {e}")
-        return "unknown"
 
 def handle_reclamer_panne(event):
     fr = is_french(event)
@@ -198,8 +174,6 @@ def _save_complaint(event, product_ref, under_warranty, problem_desc, customer_e
     # ── Sentiment Analysis AVANT invoke_agent ─────────────────────
     sentiment_data = detect_sentiment(problem_desc)
     sentiment      = sentiment_data["sentiment"]
-    problem_category = predict_problem_category(problem_desc)
-    logger.info(f"Problem category: {problem_category}")
     logger.info(f"Sentiment détecté : {sentiment_data}")
 
     # ── Agent Bedrock avec sentiment ──────────────────────────────
@@ -222,7 +196,6 @@ def _save_complaint(event, product_ref, under_warranty, problem_desc, customer_e
             "ai_analysis": {
                 "solution":        solution,
                 "sentiment":       sentiment_data["sentiment"],
-                "problem_category": problem_category,
                 "sentiment_score": sentiment_data["sentiment_score"],
             }
         })
