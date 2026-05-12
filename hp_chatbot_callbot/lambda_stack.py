@@ -50,7 +50,7 @@ class LambdaStack(Stack):
         self.orchestrator = _lambda.Function(
             self, "HpChatbotOrchestrator",
             function_name="hp-chatbot-orchestrator",
-            runtime=_lambda.Runtime.PYTHON_3_12,
+            runtime=_lambda.Runtime.PYTHON_3_11,
             handler="handler.handler",
             code=_lambda.Code.from_asset("lambda/orchestrator"),
             role=lambda_role,
@@ -106,7 +106,7 @@ class LambdaStack(Stack):
         self.send_email = _lambda.Function(
             self, "SendEmailFunction",
             function_name="hp-send-email",
-            runtime=_lambda.Runtime.PYTHON_3_12,
+            runtime=_lambda.Runtime.PYTHON_3_11,
             handler="handler.handler",
             code=_lambda.Code.from_asset(
                 "lambda/microservices/send-email",
@@ -126,7 +126,7 @@ class LambdaStack(Stack):
         self.track_claim = _lambda.Function(
             self, "TrackClaimFunction",
             function_name="hp-track-claim",
-            runtime=_lambda.Runtime.PYTHON_3_12,
+            runtime=_lambda.Runtime.PYTHON_3_11,
             handler="handler.handler",
             code=_lambda.Code.from_asset("lambda/microservices/track-claim"),
             role=microservice_role,
