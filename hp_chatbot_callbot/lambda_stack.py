@@ -69,10 +69,7 @@ class LambdaStack(Stack):
         self.orchestrator.add_to_role_policy(
             iam.PolicyStatement(
                 actions=["bedrock:InvokeAgent"],
-                resources=[
-                    "arn:aws:bedrock:us-east-1:471112585335:"
-                    "agent-alias/R604OPQQWY/77RNRLMRAS"
-                ]
+                resources=["*"]
             )
         )
 
