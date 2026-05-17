@@ -4,3 +4,4 @@ joblib
 numpy
 scipy
 gunicorn
+requests

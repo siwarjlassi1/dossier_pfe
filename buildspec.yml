@@ -8,7 +8,7 @@ phases:
     commands:
       - echo Installing dependencies...
       - npm install -g aws-cdk
-      - pip install -r requirements.txt
+      - pip install -r requirements.txt -t lambda/orchestrator
 
   build:
     commands:
