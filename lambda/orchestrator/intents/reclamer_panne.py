@@ -248,6 +248,7 @@ def _save_complaint(event, product_ref, under_warranty, problem_desc, customer_e
     if fr:
         msg = (
             f"✅ Réclamation confirmée ! Numéro : {complaint_id}.\n\n"
+            f"📊 Catégorie détectée : {problem_category}\n\n"
             f"🤖 Solution proposée par notre IA :\n{solution}\n\n"
             f"📧 Un email de confirmation a été envoyé à {customer_email}.\n\n"
             f"Notre équipe vous contactera sous 24h."
@@ -255,6 +256,7 @@ def _save_complaint(event, product_ref, under_warranty, problem_desc, customer_e
     else:
         msg = (
             f"✅ Complaint confirmed! Number: {complaint_id}.\n\n"
+            f"📊 Detected problem category: {problem_category}\n\n"
             f"🤖 AI proposed solution:\n{solution}\n\n"
             f"📧 A confirmation email has been sent to {customer_email}.\n\n"
             f"Our team will contact you within 24h."
