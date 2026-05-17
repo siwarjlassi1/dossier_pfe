@@ -2,7 +2,7 @@
 call_microservice = None
 import logging
 import boto3
-
+import requests
 from .utils import (
     get_slot, elicit_slot, elicit_slot_with_buttons,
     close, delegate, is_french
@@ -30,6 +30,28 @@ def detect_sentiment(text: str) -> dict:
         logger.error(f"Comprehend error: {e}")
         return {"sentiment": "UNKNOWN", "sentiment_score": {}}
 
+
+def predict_problem_category(text: str) -> str:
+
+    try:
+
+        response = requests.post(
+            "http://52.205.197.203:5000/predict",
+            json={"text": text},
+            timeout=10
+        )
+
+        prediction = response.json()["prediction"]
+
+        logger.info(f"ML prediction: {prediction}")
+
+        return prediction
+
+    except Exception as e:
+
+        logger.error(f"ML API error: {e}")
+
+        return "unknown"
 
 def handle_reclamer_panne(event):
     fr = is_french(event)
@@ -174,6 +196,7 @@ def _save_complaint(event, product_ref, under_warranty, problem_desc, customer_e
     # ── Sentiment Analysis AVANT invoke_agent ─────────────────────
     sentiment_data = detect_sentiment(problem_desc)
     sentiment      = sentiment_data["sentiment"]
+    problem_category = predict_problem_category(problem_desc)
     logger.info(f"Sentiment détecté : {sentiment_data}")
 
     # ── Agent Bedrock avec sentiment ──────────────────────────────
@@ -197,6 +220,7 @@ def _save_complaint(event, product_ref, under_warranty, problem_desc, customer_e
                 "solution":        solution,
                 "sentiment":       sentiment_data["sentiment"],
                 "sentiment_score": sentiment_data["sentiment_score"],
+                "problem_category": problem_category,
             }
         })
         complaint_id = save_result.get("complaint_id", "N/A")
