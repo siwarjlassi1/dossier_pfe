@@ -66,16 +66,21 @@ def handler(event, context):
                 "description":    description,
                 "underWarranty":  under_warranty,
                 "status":         "OPEN",
-                # ── Sentiment & Solution ──────────────────────────
+
+                 # ── IA Analysis ─────────────────────────────
                 "solution":       ai_analysis.get("solution", ""),
                 "sentiment":      ai_analysis.get("sentiment", "UNKNOWN"),
+
+                # ✅ ML Classification
+                "problemCategory": ai_analysis.get("problem_category", "unknown"),
+
                 "sentimentScore": {
                     "positive": str(ai_analysis.get("sentiment_score", {}).get("Positive", 0)),
                     "negative": str(ai_analysis.get("sentiment_score", {}).get("Negative", 0)),
                     "neutral":  str(ai_analysis.get("sentiment_score", {}).get("Neutral", 0)),
                     "mixed":    str(ai_analysis.get("sentiment_score", {}).get("Mixed", 0)),
-                }
-            }
+                    }
+                    }
 
             complaints_table.put_item(Item=item)
             logger.info(f"Réclamation enregistrée : {complaint_id}")
