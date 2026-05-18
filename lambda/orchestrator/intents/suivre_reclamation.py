@@ -103,6 +103,7 @@ def _check_reclamation(event, reclamation_id, fr, session_attributes):
         solution    = result.get("solution", "N/A")
         warranty    = result.get("under_warranty", False)
         created_at  = result.get("created_at", "N/A")
+        problem_category = result.get("problem_category","N/A")
 
         # ── Labels de statut ──────────────────────────────────────
         status_messages_fr = {
@@ -128,6 +129,7 @@ def _check_reclamation(event, reclamation_id, fr, session_attributes):
             f"🔖 Numéro   : {reclamation_id}\n"
             f"💻 Produit  : {product_ref}\n"
             f"🔧 Problème : {problem}\n"
+            f"🧠 Catégorie Du Problème : {problem_category}\n"
             f"💡 Solution : {solution}\n"
             f"📊 Statut   : {status_label}\n"
             f"🛡️ Garantie : {warranty_label}\n"
@@ -137,6 +139,7 @@ def _check_reclamation(event, reclamation_id, fr, session_attributes):
             f"🔖 Claim ID  : {reclamation_id}\n"
             f"💻 Product   : {product_ref}\n"
             f"🔧 Problem   : {problem}\n"
+            f"🧠 Problem Category : {problem_category}\n"
             f"💡 Solution  : {solution}\n"
             f"📊 Status    : {status_label}\n"
             f"🛡️ Warranty  : {warranty_label}\n"
