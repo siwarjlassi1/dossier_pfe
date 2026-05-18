@@ -48,6 +48,7 @@ def handler(event, context):
                 "product_ref":         complaint.get("productRef", "N/A"),
                 "problem_description": complaint.get("description", "N/A"),
                 "solution":            complaint.get("solution", "N/A"),
+                "problem_category":    complaint.get("problemCategory", "N/A"),
                 "sentiment":           complaint.get("sentiment", "N/A"),
                 "under_warranty":      complaint.get("underWarranty", False),
                 "created_at":          str(complaint.get("createdAt", "N/A"))[:10],
@@ -73,6 +74,7 @@ def handler(event, context):
                     "description":         c.get("description", "N/A"),
                     "solution":            c.get("solution", "N/A"),
                     "sentiment":           c.get("sentiment", "N/A"),
+                    "problem_category": c.get("problemCategory", "N/A"),
                     "under_warranty":      c.get("underWarranty", False),
                     "created_at":          str(c.get("createdAt", "N/A")),
                 }
