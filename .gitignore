@@ -13,3 +13,8 @@ cdk.out
 layers/
 ML/models/
 *.pkl
+
+ML/results/
+*.safetensors
+*.pt
+*.bin
