@@ -4,23 +4,37 @@ phases:
   install:
     runtime-versions:
       python: 3.12
+      nodejs: 18
 
     commands:
-      - echo Installing dependencies...
+      - echo "📦 Installing dependencies..."
       - npm install -g aws-cdk
+      - pip install --upgrade pip
       - pip install -r requirements.txt
-      - pip install requests -t lambda/orchestrator
+
+  pre_build:
+    commands:
+      - echo "🔍 Listing CDK stacks..."
+      - cdk list
+      - echo "📊 Current AWS account and region..."
+      - aws sts get-caller-identity
 
   build:
     commands:
-      - echo Synthesizing CDK...
+      - echo "🏗️ Synthesizing CDK..."
       - cdk synth
 
   post_build:
     commands:
-      - echo Deploying CDK stacks...
-      - cdk deploy HpChatbotLambdaStack --require-approval never
+      - echo "🚀 Deploying all stacks..."
+      - cdk deploy --all --require-approval never
 
 artifacts:
   files:
     - '**/*'
+  base-directory: cdk.out
+
+cache:
+  paths:
+    - 'node_modules/**/*'
+    - '.venv/**/*'
