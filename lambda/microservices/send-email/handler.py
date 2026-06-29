@@ -1,14 +1,16 @@
-#Le microservice de notification qui envoie un email de confirmation au client
 import json
 import logging
 import os
-import urllib.request
+import boto3
+from botocore.exceptions import ClientError
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-SENDER_EMAIL     = os.environ["SENDER_EMAIL"]
-SENDGRID_API_KEY = os.environ["SENDGRID_API_KEY"]
+SENDER_EMAIL = os.environ["SENDER_EMAIL"]
+
+# Client SES
+ses_client = boto3.client('ses', region_name='us-east-1')
 
 
 def handler(event, context):
@@ -95,39 +97,36 @@ def send_confirmation(body):
         </html>
         """
 
-    # ✅ Envoi via SendGrid API (sans dépendances)
-    _send_via_sendgrid(recipient, subject, html_body)
+    # ✅ Envoi via Amazon SES
+    try:
+        _send_via_ses(recipient, subject, html_body)
+        logger.info(f"✅ Email sent to {recipient} for complaint {complaint_id}")
+        return _response(200, {"sent": True})
+    except ClientError as e:
+        logger.error(f"❌ SES error: {e.response['Error']['Message']}")
+        return _response(500, {"error": f"Email sending failed: {e.response['Error']['Message']}"})
 
-    logger.info(f"Email sent to {recipient} for complaint {complaint_id}")
-    return _response(200, {"sent": True})
 
-
-def _send_via_sendgrid(to_email, subject, html_body):
-    """Appel direct à l'API SendGrid sans librairie externe."""
-    payload = json.dumps({
-        "personalizations": [{"to": [{"email": to_email}]}],
-        "from": {"email": SENDER_EMAIL},
-        "subject": subject,
-        "content": [{"type": "text/html", "value": html_body}]
-    }).encode("utf-8")
-
-    req = urllib.request.Request(
-        #Appel API SendGrid
-        "https://api.sendgrid.com/v3/mail/send",
-        data=payload,
-        method="POST",
-        headers={
-            "Authorization": f"Bearer {SENDGRID_API_KEY}",
-            "Content-Type":  "application/json"
+def _send_via_ses(to_email, subject, html_body):
+    """Envoi via Amazon SES"""
+    response = ses_client.send_email(
+        Source=SENDER_EMAIL,
+        Destination={'ToAddresses': [to_email]},
+        Message={
+            'Subject': {'Data': subject, 'Charset': 'UTF-8'},
+            'Body': {'Html': {'Data': html_body, 'Charset': 'UTF-8'}}
         }
     )
-    with urllib.request.urlopen(req, timeout=10) as resp:
-        logger.info(f"SendGrid response status: {resp.status}")
+    logger.info(f"📧 SES MessageId: {response['MessageId']}")
+    return response
 
 
 def _response(status_code, body):
     return {
         "statusCode": status_code,
-        "headers": {"Content-Type": "application/json"},
+        "headers": {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*"
+        },
         "body": json.dumps(body)
     }
