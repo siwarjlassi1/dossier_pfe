@@ -28,3 +28,16 @@ flask-cors>=4.0.0
 
 # AWS (si besoin)
 boto3>=1.28.0
+
+torch==2.0.1
+transformers==4.30.2
+datasets==2.14.0
+rouge-score==0.1.2
+nltk==3.8.1
+sentencepiece==0.1.99
+protobuf==3.20.3
+accelerate==0.20.3
+scikit-learn==1.3.0
+pandas==2.0.3
+numpy==1.24.3
+tqdm==4.65.0
