@@ -1,3 +1,5 @@
+# lambda/microservices/send-email/handler.py
+
 import json
 import logging
 import os
@@ -14,9 +16,16 @@ ses_client = boto3.client('ses', region_name='us-east-1')
 
 
 def handler(event, context):
+    """Handler principal"""
     try:
-        body = json.loads(event.get("body", "{}"))
+        # Gérer les deux formats d'event (API Gateway et direct)
+        if isinstance(event, str):
+            event = json.loads(event)
+        
+        body = event if "action" in event else json.loads(event.get("body", "{}"))
         action = body.get("action")
+
+        logger.info(f"📥 Action reçue: {action}")
 
         if action == "send_confirmation":
             return send_confirmation(body)
@@ -24,7 +33,7 @@ def handler(event, context):
             return _response(400, {"error": f"Unknown action: {action}"})
 
     except Exception as e:
-        logger.exception("Error in send-email microservice")
+        logger.exception("❌ Error in send-email microservice")
         return _response(500, {"error": str(e)})
 
 
@@ -35,64 +44,166 @@ def send_confirmation(body):
     complaint_id = body.get("complaint_id")
     product_ref  = body.get("product_ref")
     problem      = body.get("problem_description")
+    solution     = body.get("solution", "")  # 🆕 Solution
+    summary      = body.get("summary", "")   # 🆕 Résumé
     language     = body.get("language", "en")
 
     if not recipient:
         return _response(400, {"error": "Missing email"})
 
+    logger.info(f"📧 Envoi email à {recipient} pour réclamation {complaint_id}")
+
     if language == "fr":
-        subject = "✅ Votre réclamation a bien été enregistrée"
+        subject = f"✅ Réclamation #{complaint_id} - Confirmation"
         html_body = f"""
         <html>
-        <body style="font-family: Arial, sans-serif; padding: 20px;">
-            <h2 style="color: #e87722;">📋 Confirmation de réclamation</h2>
-            <p>Bonjour,</p>
-            <p>Votre réclamation a bien été enregistrée. Voici le récapitulatif :</p>
-            <table style="border-collapse: collapse; width: 100%;">
-                <tr style="background-color: #f2f2f2;">
-                    <td style="padding: 8px; border: 1px solid #ddd;"><b>🔖 Numéro</b></td>
-                    <td style="padding: 8px; border: 1px solid #ddd;">{complaint_id}</td>
-                </tr>
-                <tr>
-                    <td style="padding: 8px; border: 1px solid #ddd;"><b>💻 Produit</b></td>
-                    <td style="padding: 8px; border: 1px solid #ddd;">{product_ref}</td>
-                </tr>
-                <tr style="background-color: #f2f2f2;">
-                    <td style="padding: 8px; border: 1px solid #ddd;"><b>🔧 Problème</b></td>
-                    <td style="padding: 8px; border: 1px solid #ddd;">{problem}</td>
-                </tr>
-            </table>
-            <br>
-            <p>Vous pouvez suivre votre réclamation en utilisant votre numéro.</p>
-            <p style="color: #888;">HP Support</p>
+        <head>
+            <style>
+                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+                .header {{ background: #0096D6; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }}
+                .content {{ padding: 20px; background: #f9f9f9; }}
+                .info-table {{ width: 100%; border-collapse: collapse; margin: 20px 0; }}
+                .info-table td {{ padding: 12px; border: 1px solid #ddd; }}
+                .info-table tr:nth-child(even) {{ background-color: #f2f2f2; }}
+                .solution-box {{ background: #e8f4f8; border-left: 4px solid #0096D6; padding: 15px; margin: 20px 0; }}
+                .summary-box {{ background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; }}
+                .footer {{ text-align: center; padding: 20px; color: #666; font-size: 12px; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>🖨️ HP Support</h1>
+                    <p>Confirmation de réclamation</p>
+                </div>
+                
+                <div class="content">
+                    <h2>Bonjour,</h2>
+                    
+                    <p>Votre réclamation a été enregistrée avec succès.</p>
+                    
+                    <table class="info-table">
+                        <tr>
+                            <td><b>🔖 Numéro de réclamation</b></td>
+                            <td>{complaint_id}</td>
+                        </tr>
+                        <tr>
+                            <td><b>💻 Produit</b></td>
+                            <td>{product_ref}</td>
+                        </tr>
+                        <tr>
+                            <td><b>🔧 Problème signalé</b></td>
+                            <td>{problem}</td>
+                        </tr>
+                    </table>
+                    
+                    {f'''
+                    <div class="solution-box">
+                        <h3>🤖 Solution proposée par notre IA</h3>
+                        <p>{solution}</p>
+                    </div>
+                    ''' if solution else ''}
+                    
+                    {f'''
+                    <div class="summary-box">
+                        <h3>📊 Résumé de votre conversation</h3>
+                        <p>{summary}</p>
+                    </div>
+                    ''' if summary else ''}
+                    
+                    <p><strong>📞 Prochaines étapes :</strong></p>
+                    <ul>
+                        <li>Notre équipe technique vous contactera sous 24 heures</li>
+                        <li>Vous pouvez suivre votre réclamation avec le numéro ci-dessus</li>
+                        <li>Conservez ce numéro pour toute correspondance future</li>
+                    </ul>
+                    
+                    <p>Cordialement,<br><strong>L'équipe HP Support</strong></p>
+                </div>
+                
+                <div class="footer">
+                    <p>© 2026 HP Inc. Tous droits réservés.</p>
+                    <p>Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>
+                </div>
+            </div>
         </body>
         </html>
         """
     else:
-        subject = "✅ Your claim has been registered"
+        subject = f"✅ Claim #{complaint_id} - Confirmation"
         html_body = f"""
         <html>
-        <body style="font-family: Arial, sans-serif; padding: 20px;">
-            <h2 style="color: #e87722;">📋 Claim Confirmation</h2>
-            <p>Hello,</p>
-            <p>Your claim has been successfully registered. Here is a summary:</p>
-            <table style="border-collapse: collapse; width: 100%;">
-                <tr style="background-color: #f2f2f2;">
-                    <td style="padding: 8px; border: 1px solid #ddd;"><b>🔖 Claim ID</b></td>
-                    <td style="padding: 8px; border: 1px solid #ddd;">{complaint_id}</td>
-                </tr>
-                <tr>
-                    <td style="padding: 8px; border: 1px solid #ddd;"><b>💻 Product</b></td>
-                    <td style="padding: 8px; border: 1px solid #ddd;">{product_ref}</td>
-                </tr>
-                <tr style="background-color: #f2f2f2;">
-                    <td style="padding: 8px; border: 1px solid #ddd;"><b>🔧 Problem</b></td>
-                    <td style="padding: 8px; border: 1px solid #ddd;">{problem}</td>
-                </tr>
-            </table>
-            <br>
-            <p>You can track your claim using your claim ID.</p>
-            <p style="color: #888;">HP Support</p>
+        <head>
+            <style>
+                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+                .header {{ background: #0096D6; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }}
+                .content {{ padding: 20px; background: #f9f9f9; }}
+                .info-table {{ width: 100%; border-collapse: collapse; margin: 20px 0; }}
+                .info-table td {{ padding: 12px; border: 1px solid #ddd; }}
+                .info-table tr:nth-child(even) {{ background-color: #f2f2f2; }}
+                .solution-box {{ background: #e8f4f8; border-left: 4px solid #0096D6; padding: 15px; margin: 20px 0; }}
+                .summary-box {{ background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; }}
+                .footer {{ text-align: center; padding: 20px; color: #666; font-size: 12px; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>🖨️ HP Support</h1>
+                    <p>Claim Confirmation</p>
+                </div>
+                
+                <div class="content">
+                    <h2>Hello,</h2>
+                    
+                    <p>Your claim has been successfully registered.</p>
+                    
+                    <table class="info-table">
+                        <tr>
+                            <td><b>🔖 Claim ID</b></td>
+                            <td>{complaint_id}</td>
+                        </tr>
+                        <tr>
+                            <td><b>💻 Product</b></td>
+                            <td>{product_ref}</td>
+                        </tr>
+                        <tr>
+                            <td><b>🔧 Reported Issue</b></td>
+                            <td>{problem}</td>
+                        </tr>
+                    </table>
+                    
+                    {f'''
+                    <div class="solution-box">
+                        <h3>🤖 AI Proposed Solution</h3>
+                        <p>{solution}</p>
+                    </div>
+                    ''' if solution else ''}
+                    
+                    {f'''
+                    <div class="summary-box">
+                        <h3>📊 Conversation Summary</h3>
+                        <p>{summary}</p>
+                    </div>
+                    ''' if summary else ''}
+                    
+                    <p><strong>📞 Next Steps:</strong></p>
+                    <ul>
+                        <li>Our technical team will contact you within 24 hours</li>
+                        <li>You can track your claim using the number above</li>
+                        <li>Keep this number for future correspondence</li>
+                    </ul>
+                    
+                    <p>Best regards,<br><strong>HP Support Team</strong></p>
+                </div>
+                
+                <div class="footer">
+                    <p>© 2026 HP Inc. All rights reserved.</p>
+                    <p>This email was sent automatically, please do not reply.</p>
+                </div>
+            </div>
         </body>
         </html>
         """
@@ -101,7 +212,7 @@ def send_confirmation(body):
     try:
         _send_via_ses(recipient, subject, html_body)
         logger.info(f"✅ Email sent to {recipient} for complaint {complaint_id}")
-        return _response(200, {"sent": True})
+        return _response(200, {"sent": True, "recipient": recipient})
     except ClientError as e:
         logger.error(f"❌ SES error: {e.response['Error']['Message']}")
         return _response(500, {"error": f"Email sending failed: {e.response['Error']['Message']}"})

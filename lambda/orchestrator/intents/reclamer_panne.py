@@ -1,8 +1,9 @@
-#La logique complète de gestion des réclamations clients avec IA
-call_microservice = None
+# lambda/orchestrator/intents/reclamer_panne.py
+
 import logging
 import boto3
 import requests
+import json
 from .utils import (
     get_slot, elicit_slot, elicit_slot_with_buttons,
     close, delegate, is_french
@@ -11,8 +12,12 @@ from model_normalizer import normalize_product_ref
 from .bedrock_agent import invoke_agent, get_session_id
 
 comprehend = boto3.client("comprehend", region_name="us-east-1")
+lambda_client = boto3.client('lambda')
 
 logger = logging.getLogger()
+
+# Variable globale pour appeler les microservices
+call_microservice = None
 
 
 def detect_sentiment(text: str) -> dict:
@@ -32,35 +37,32 @@ def detect_sentiment(text: str) -> dict:
 
 
 def predict_problem_category(text: str) -> str:
-
+    """Prédit la catégorie du problème via ML API."""
     try:
-
         response = requests.post(
             "http://52.205.197.203:5000/predict",
             json={"text": text},
             timeout=10
         )
-
         prediction = response.json()["prediction"]
-
         logger.info(f"ML prediction: {prediction}")
-
         return prediction
-
     except Exception as e:
-
         logger.error(f"ML API error: {e}")
-
         return "unknown"
 
+
 def handle_reclamer_panne(event):
+    """
+    Point d'entrée principal pour l'intent ReclamarPanne
+    """
     fr = is_french(event)
 
     product_type   = get_slot(event, "ProductType")
     product_ref    = get_slot(event, "ProductReference")
     under_warranty = get_slot(event, "UnderWarranty")
     problem_desc   = get_slot(event, "ProblemDescription")
-    customer_email = get_slot(event, "CustomerEmail")  # 🆕
+    customer_email = get_slot(event, "CustomerEmail")
 
     session_attrs = event.get("sessionState", {}).get("sessionAttributes", {}) or {}
 
@@ -112,20 +114,17 @@ def handle_reclamer_panne(event):
               else "Please describe the problem:"
         return elicit_slot(event, "ProblemDescription", msg)
 
-
     # ── ÉTAPE 4.5 : Email du client ───────────────────────────────
     if not customer_email:
         msg = "Quel est votre adresse email pour recevoir la confirmation ?" if fr \
             else "What is your email address to receive the confirmation?"
         return elicit_slot(event, "CustomerEmail", msg)
 
-        # ── Validation email 🆕 ───────────────────────────────────────
+    # ── Validation email ──────────────────────────────────────────
     if "@" not in customer_email or "." not in customer_email:
         msg = "Adresse email invalide. Veuillez réessayer (ex: nom@gmail.com) :" if fr \
             else "Invalid email address. Please try again (e.g. name@gmail.com):"
         return elicit_slot(event, "CustomerEmail", msg)
-
-    
 
     # ── ÉTAPE 5 : Confirmation ────────────────────────────────────
     if confirmation_state == "Denied":
@@ -187,19 +186,22 @@ def handle_reclamer_panne(event):
 
 
 def _save_complaint(event, product_ref, under_warranty, problem_desc, customer_email, fr):
-
+    """
+    Sauvegarde la réclamation et génère le résumé
+    """
+    
     session_id    = get_session_id(event)
     session_attrs = event.get("sessionState", {}) \
                          .get("sessionAttributes", {}) or {}
     session_attrs["agent_session_id"] = session_id
 
-    # ── Sentiment Analysis AVANT invoke_agent ─────────────────────
+    # ── Sentiment Analysis ────────────────────────────────────────
     sentiment_data = detect_sentiment(problem_desc)
     sentiment      = sentiment_data["sentiment"]
     problem_category = predict_problem_category(problem_desc)
     logger.info(f"Sentiment détecté : {sentiment_data}")
 
-    # ── Agent Bedrock avec sentiment ──────────────────────────────
+    # ── Agent Bedrock ─────────────────────────────────────────────
     try:
         agent_result = invoke_agent(problem_desc, product_ref, session_id, sentiment, fr)
         solution     = agent_result.get("solution", "")
@@ -229,18 +231,82 @@ def _save_complaint(event, product_ref, under_warranty, problem_desc, customer_e
         logger.error(f"Save complaint error: {e}")
         complaint_id = "N/A"
 
-    # ── Envoi Email 🆕 ────────────────────────────────────────────
+    # ── 🆕 GÉNÉRATION DU RÉSUMÉ ────────────────────────────────────
+    conversation_summary = ""
+    try:
+        # 🔍 DEBUG : Vérifier les paramètres
+        logger.info(f"🔍 DEBUG - product_ref: {product_ref}")
+        logger.info(f"🔍 DEBUG - problem_desc: {problem_desc}")
+        logger.info(f"🔍 DEBUG - solution: {solution[:100] if solution else 'VIDE'}")
+        logger.info(f"🔍 DEBUG - under_warranty: {under_warranty}")
+        logger.info(f"🔍 DEBUG - fr: {fr}")
+        
+        # Construire le dialogue
+        dialogue = _build_conversation_dialogue(
+            product_ref, problem_desc, solution, under_warranty, fr
+        )
+        
+        # 🔍 DEBUG : Vérifier le dialogue construit
+        logger.info(f"🔍 DEBUG - dialogue length: {len(dialogue)}")
+        logger.info(f"📝 Dialogue construit:\n{dialogue}")
+        
+        logger.info("🔄 Génération du résumé de conversation...")
+        
+        # Appeler le microservice de résumé
+        payload = {
+            'dialogue': dialogue,
+            'conversation_id': complaint_id
+        }
+        
+        # 🔍 DEBUG : Vérifier le payload
+        logger.info(f"🔍 DEBUG - Payload envoyé: {json.dumps(payload)[:200]}")
+        
+        response = lambda_client.invoke(
+            FunctionName='hp-chatbot-summarize',
+            InvocationType='RequestResponse',
+            Payload=json.dumps(payload)
+        )
+        
+        result = json.loads(response['Payload'].read())
+        
+        # 🔍 DEBUG : Vérifier la réponse
+        logger.info(f"📥 Réponse Lambda summarize: {json.dumps(result)}")
+        
+        if result.get('statusCode') == 200:
+            body = json.loads(result['body'])
+            if body.get('success'):
+                conversation_summary = body['summary']
+                logger.info(f"✅ Résumé généré: {conversation_summary}")
+            else:
+                logger.warning(f"⚠️ Summarize returned success=False: {body}")
+        else:
+            logger.warning(f"⚠️ Summarize returned status {result.get('statusCode')}")
+        
+    except Exception as e:
+        logger.error(f"❌ Erreur génération résumé: {e}")
+        import traceback
+        traceback.print_exc()
+        conversation_summary = ""
+
+    # ── Envoi Email avec résumé ───────────────────────────────────
     if customer_email and complaint_id != "N/A":
         try:
-            call_microservice("send-email", {
+            email_payload = {
                 "action":               "send_confirmation",
                 "email":                customer_email,
                 "complaint_id":         complaint_id,
                 "product_ref":          product_ref,
                 "problem_description":  problem_desc,
+                "solution":             solution,
+                "summary":              conversation_summary,
                 "language":             "fr" if fr else "en"
-            })
-            logger.info(f"Email envoyé à {customer_email}")
+            }
+            
+            # 🔍 DEBUG : Vérifier le payload email
+            logger.info(f"🔍 DEBUG - Email payload summary: {email_payload.get('summary', 'VIDE')}")
+            
+            call_microservice("send-email", email_payload)
+            logger.info(f"📧 Email avec résumé envoyé à {customer_email}")
         except Exception as e:
             logger.error(f"Email error: {e}")
 
@@ -250,7 +316,15 @@ def _save_complaint(event, product_ref, under_warranty, problem_desc, customer_e
             f"✅ Réclamation confirmée ! Numéro : {complaint_id}.\n\n"
             f"📊 Catégorie détectée : {problem_category}\n\n"
             f"🤖 Solution proposée par notre IA :\n{solution}\n\n"
-            f"📧 Un email de confirmation a été envoyé à {customer_email}.\n\n"
+        )
+        
+        if conversation_summary:
+            msg += f"📋 Résumé de votre conversation :\n{conversation_summary}\n\n"
+        else:
+            logger.warning("⚠️ Aucun résumé à afficher dans la réponse Lex")
+        
+        msg += (
+            f"📧 Un email de confirmation avec le résumé complet a été envoyé à {customer_email}.\n\n"
             f"Notre équipe vous contactera sous 24h."
         )
     else:
@@ -258,8 +332,45 @@ def _save_complaint(event, product_ref, under_warranty, problem_desc, customer_e
             f"✅ Complaint confirmed! Number: {complaint_id}.\n\n"
             f"📊 Detected problem category: {problem_category}\n\n"
             f"🤖 AI proposed solution:\n{solution}\n\n"
-            f"📧 A confirmation email has been sent to {customer_email}.\n\n"
+        )
+        
+        if conversation_summary:
+            msg += f"📋 Conversation summary:\n{conversation_summary}\n\n"
+        else:
+            logger.warning("⚠️ No summary to display in Lex response")
+        
+        msg += (
+            f"📧 A confirmation email with the full summary has been sent to {customer_email}.\n\n"
             f"Our team will contact you within 24h."
         )
 
     return close(event, msg, fulfilled=True)
+
+
+
+def _build_conversation_dialogue(product_ref, problem_desc, solution, under_warranty, fr):
+    """
+    Construit un dialogue formaté pour le résumeur
+    """
+    warranty_status = "sous garantie" if under_warranty == "yes" else "hors garantie"
+    
+    if fr:
+        dialogue = f"""Client: Bonjour, j'ai un problème avec mon {product_ref}
+Agent: Bonjour, je vais vous aider. Quel est le problème exactement ?
+Client: {problem_desc}
+Agent: Je comprends. Votre produit est-il sous garantie ?
+Client: Oui, il est {warranty_status}
+Agent: Très bien. Voici la solution : {solution if solution else "Notre équipe technique va vous contacter sous 24h"}
+Client: Merci pour votre aide"""
+    else:
+        warranty_status = "under warranty" if under_warranty == "yes" else "out of warranty"
+        dialogue = f"""Customer: Hello, I have a problem with my {product_ref}
+Agent: Hello, I'll help you. What is the exact problem?
+Customer: {problem_desc}
+Agent: I understand. Is your product under warranty?
+Customer: Yes, it is {warranty_status}
+Agent: Very well. Here is the solution: {solution if solution else "Our technical team will contact you within 24h"}
+Customer: Thank you for your help"""
+    
+    return dialogue
+

@@ -31,6 +31,8 @@ class LambdaStack(Stack):
         dynamo_stack.products_table.grant_read_data(lambda_role)
         dynamo_stack.orders_table.grant_read_write_data(lambda_role)
         dynamo_stack.complaints_table.grant_read_write_data(lambda_role)
+        
+        # Permissions Bedrock
         lambda_role.add_to_policy(
             iam.PolicyStatement(
                 actions=[
@@ -45,6 +47,70 @@ class LambdaStack(Stack):
                 ]
             )
         )
+
+        # ── IAM Role pour les microservices ──────────────────────────
+        microservice_role = iam.Role(
+            self, "HpChatbotMicroserviceRole",
+            assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"),
+            managed_policies=[
+                iam.ManagedPolicy.from_aws_managed_policy_name(
+                    "service-role/AWSLambdaBasicExecutionRole"
+                ),
+            ],
+        )
+
+        # ── 🆕 Lambda Summarize ──────────────────────────────────────
+        self.summarize = _lambda.Function(
+            self, "SummarizeFunction",
+            function_name="hp-chatbot-summarize",
+            runtime=_lambda.Runtime.PYTHON_3_11,
+            handler="handler.lambda_handler",
+            code=_lambda.Code.from_asset("lambda/microservices/summarize"),
+            role=microservice_role,
+            timeout=Duration.seconds(30),
+            memory_size=256,
+        )
+
+        # ── Lambda send-email ────────────────────────────────────────
+        self.send_email = _lambda.Function(
+            self, "SendEmailFunction",
+            function_name="hp-send-email",
+            runtime=_lambda.Runtime.PYTHON_3_11,
+            handler="handler.handler",
+            code=_lambda.Code.from_asset("lambda/microservices/send-email"),
+            role=microservice_role,
+            timeout=Duration.seconds(15),
+            memory_size=128,
+            environment={
+                "SENDER_EMAIL":      "jlassisywar776@gmail.com",
+            },
+        )
+
+        # Permission SES pour send-email
+        self.send_email.add_to_role_policy(
+            iam.PolicyStatement(
+                actions=["ses:SendEmail", "ses:SendRawEmail"],
+                resources=["*"]
+            )
+        )
+
+        # ── Lambda track-claim ───────────────────────────────────────
+        self.track_claim = _lambda.Function(
+            self, "TrackClaimFunction",
+            function_name="hp-track-claim",
+            runtime=_lambda.Runtime.PYTHON_3_11,
+            handler="handler.handler",
+            code=_lambda.Code.from_asset("lambda/microservices/track-claim"),
+            role=microservice_role,
+            timeout=Duration.seconds(15),
+            memory_size=128,
+            environment={
+                "COMPLAINTS_TABLE": dynamo_stack.complaints_table.table_name,
+            },
+        )
+
+        # Permission DynamoDB pour track-claim
+        dynamo_stack.complaints_table.grant_read_data(self.track_claim)
 
         # ── Lambda Orchestrateur ─────────────────────────────────────
         self.orchestrator = _lambda.Function(
@@ -65,6 +131,20 @@ class LambdaStack(Stack):
             },
         )
 
+        # 🆕 Permission : Orchestrator peut invoquer les microservices
+        self.orchestrator.add_to_role_policy(
+            iam.PolicyStatement(
+                effect=iam.Effect.ALLOW,
+                actions=["lambda:InvokeFunction"],
+                resources=[
+                    self.summarize.function_arn,
+                    self.send_email.function_arn,
+                    self.track_claim.function_arn,
+                    f"arn:aws:lambda:{self.region}:{self.account}:function:hp-chatbot-*"
+                ]
+            )
+        )
+
         # Permission : Lambda peut invoquer l'Agent Bedrock
         self.orchestrator.add_to_role_policy(
             iam.PolicyStatement(
@@ -73,7 +153,7 @@ class LambdaStack(Stack):
             )
         )
 
-        # ── Permission Comprehend ────────────────────────────────────
+        # Permission Comprehend
         self.orchestrator.add_to_role_policy(
             iam.PolicyStatement(
                 actions=["comprehend:DetectSentiment"],
@@ -81,66 +161,21 @@ class LambdaStack(Stack):
             )
         )
 
-        # ── Permission Lex → Lambda ──────────────────────────────────
+        # Permission Lex → Lambda
         self.orchestrator.add_permission(
             "LexInvokePermission",
             principal=iam.ServicePrincipal("lexv2.amazonaws.com"),
             action="lambda:InvokeFunction",
         )
 
-        # ── IAM Role pour les microservices ──────────────────────────
-        microservice_role = iam.Role(
-            self, "HpChatbotMicroserviceRole",
-            assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"),
-            managed_policies=[
-                iam.ManagedPolicy.from_aws_managed_policy_name(
-                    "service-role/AWSLambdaBasicExecutionRole"
-                ),
-            ],
-        )
-
-        # ── Lambda send-email ✅ SendGrid ────────────────────────────
-        self.send_email = _lambda.Function(
-            self, "SendEmailFunction",
-            function_name="hp-send-email",
-            runtime=_lambda.Runtime.PYTHON_3_11,
-            handler="handler.handler",
-            code=_lambda.Code.from_asset(
-                "lambda/microservices/send-email",
-                ),
-            role=microservice_role,
-            timeout=Duration.seconds(15),
-            memory_size=128,
-            environment={
-                "SENDER_EMAIL":      "jlassisywar776@gmail.com",
-                "SENDGRID_API_KEY":  "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",  # ✅ Ta vraie clé SendGrid ici
-                },
-                )
-
-           
-
-        # ── Lambda track-claim ───────────────────────────────────────
-        self.track_claim = _lambda.Function(
-            self, "TrackClaimFunction",
-            function_name="hp-track-claim",
-            runtime=_lambda.Runtime.PYTHON_3_11,
-            handler="handler.handler",
-            code=_lambda.Code.from_asset("lambda/microservices/track-claim"),
-            role=microservice_role,
-            timeout=Duration.seconds(15),
-            memory_size=128,
-            environment={
-                "COMPLAINTS_TABLE": dynamo_stack.complaints_table.table_name,
-            },
-        )
-
-        # Permission DynamoDB pour track-claim
-        dynamo_stack.complaints_table.grant_read_data(self.track_claim)
-
         # ── Outputs ──────────────────────────────────────────────────
         CfnOutput(
             self, "OrchestratorArn",
             value=self.orchestrator.function_arn
+        )
+        CfnOutput(
+            self, "SummarizeArn",
+            value=self.summarize.function_arn
         )
         CfnOutput(
             self, "TrackClaimArn",
