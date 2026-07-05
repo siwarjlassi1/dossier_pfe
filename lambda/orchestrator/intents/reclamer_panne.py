@@ -210,31 +210,9 @@ def _save_complaint(event, product_ref, under_warranty, problem_desc, customer_e
         logger.error(f"Agent error: {e}")
         solution = ""
 
-    # ── Sauvegarde via microservice ───────────────────────────────
-    try:
-        save_result = call_microservice("complaint", {
-            "action":         "save_complaint",
-            "product_ref":    product_ref,
-            "customer_name":  "LexUser",
-            "description":    problem_desc,
-            "under_warranty": under_warranty == "yes",
-            "ai_analysis": {
-                "solution":        solution,
-                "sentiment":       sentiment_data["sentiment"],
-                "sentiment_score": sentiment_data["sentiment_score"],
-                "problem_category": problem_category,
-            }
-        })
-        complaint_id = save_result.get("complaint_id", "N/A")
-        logger.info(f"Complaint saved: {complaint_id}")
-    except Exception as e:
-        logger.error(f"Save complaint error: {e}")
-        complaint_id = "N/A"
-
-    # ── 🆕 GÉNÉRATION DU RÉSUMÉ ────────────────────────────────────
+    # ── 🆕 GÉNÉRATION DU RÉSUMÉ (AVANT LA SAUVEGARDE) ─────────────
     conversation_summary = ""
     try:
-        # 🔍 DEBUG : Vérifier les paramètres
         logger.info(f"🔍 DEBUG - product_ref: {product_ref}")
         logger.info(f"🔍 DEBUG - problem_desc: {problem_desc}")
         logger.info(f"🔍 DEBUG - solution: {solution[:100] if solution else 'VIDE'}")
@@ -246,7 +224,6 @@ def _save_complaint(event, product_ref, under_warranty, problem_desc, customer_e
             product_ref, problem_desc, solution, under_warranty, fr
         )
         
-        # 🔍 DEBUG : Vérifier le dialogue construit
         logger.info(f"🔍 DEBUG - dialogue length: {len(dialogue)}")
         logger.info(f"📝 Dialogue construit:\n{dialogue}")
         
@@ -255,10 +232,9 @@ def _save_complaint(event, product_ref, under_warranty, problem_desc, customer_e
         # Appeler le microservice de résumé
         payload = {
             'dialogue': dialogue,
-            'conversation_id': complaint_id
+            'conversation_id': 'temp-id'  # ID temporaire
         }
         
-        # 🔍 DEBUG : Vérifier le payload
         logger.info(f"🔍 DEBUG - Payload envoyé: {json.dumps(payload)[:200]}")
         
         response = lambda_client.invoke(
@@ -269,7 +245,6 @@ def _save_complaint(event, product_ref, under_warranty, problem_desc, customer_e
         
         result = json.loads(response['Payload'].read())
         
-        # 🔍 DEBUG : Vérifier la réponse
         logger.info(f"📥 Réponse Lambda summarize: {json.dumps(result)}")
         
         if result.get('statusCode') == 200:
@@ -288,6 +263,29 @@ def _save_complaint(event, product_ref, under_warranty, problem_desc, customer_e
         traceback.print_exc()
         conversation_summary = ""
 
+    # ── 🆕 SAUVEGARDE AVEC RÉSUMÉ (APRÈS LA GÉNÉRATION) ───────────
+    try:
+        save_result = call_microservice("complaint", {
+            "action":         "save_complaint",
+            "product_ref":    product_ref,
+            "customer_name":  "LexUser",
+            "description":    problem_desc,
+            "under_warranty": under_warranty == "yes",
+            "summary":        conversation_summary,  # 🆕 RÉSUMÉ
+            "ai_analysis": {
+                "solution":        solution,
+                "sentiment":       sentiment_data["sentiment"],
+                "sentiment_score": sentiment_data["sentiment_score"],
+                "problem_category": problem_category,
+            }
+        })
+        complaint_id = save_result.get("complaint_id", "N/A")
+        logger.info(f"Complaint saved: {complaint_id}")
+        logger.info(f"📝 Résumé sauvegardé: {conversation_summary[:100] if conversation_summary else 'VIDE'}")
+    except Exception as e:
+        logger.error(f"Save complaint error: {e}")
+        complaint_id = "N/A"
+
     # ── Envoi Email avec résumé ───────────────────────────────────
     if customer_email and complaint_id != "N/A":
         try:
@@ -302,7 +300,6 @@ def _save_complaint(event, product_ref, under_warranty, problem_desc, customer_e
                 "language":             "fr" if fr else "en"
             }
             
-            # 🔍 DEBUG : Vérifier le payload email
             logger.info(f"🔍 DEBUG - Email payload summary: {email_payload.get('summary', 'VIDE')}")
             
             call_microservice("send-email", email_payload)
@@ -345,6 +342,7 @@ def _save_complaint(event, product_ref, under_warranty, problem_desc, customer_e
         )
 
     return close(event, msg, fulfilled=True)
+
 
 
 

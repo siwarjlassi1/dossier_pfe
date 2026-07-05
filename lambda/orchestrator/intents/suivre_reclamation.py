@@ -97,13 +97,14 @@ def _check_reclamation(event, reclamation_id, fr, session_attributes):
         session_attributes["reclamation_attempts"] = "0"
 
         # ── Récupérer les infos ───────────────────────────────────
-        status      = result.get("status", "UNKNOWN")
-        product_ref = result.get("product_ref", "N/A")
-        problem     = result.get("problem_description", "N/A")
-        solution    = result.get("solution", "N/A")
-        warranty    = result.get("under_warranty", False)
-        created_at  = result.get("created_at", "N/A")
-        problem_category = result.get("problem_category","N/A")
+        status           = result.get("status", "UNKNOWN")
+        product_ref      = result.get("product_ref", "N/A")
+        problem          = result.get("problem_description", "N/A")
+        solution         = result.get("solution", "N/A")
+        warranty         = result.get("under_warranty", False)
+        created_at       = result.get("created_at", "N/A")
+        problem_category = result.get("problem_category", "N/A")
+        summary          = result.get("summary", "")  # 🆕 RÉSUMÉ
 
         # ── Labels de statut ──────────────────────────────────────
         status_messages_fr = {
@@ -123,28 +124,44 @@ def _check_reclamation(event, reclamation_id, fr, session_attributes):
         warranty_label = ("✅ Oui" if warranty else "❌ Non") if fr \
                          else ("✅ Yes" if warranty else "❌ No")
 
-        # ── Message final ─────────────────────────────────────────
-        msg = (
-            f"📋 Voici les détails de votre réclamation :\n\n"
-            f"🔖 Numéro   : {reclamation_id}\n"
-            f"💻 Produit  : {product_ref}\n"
-            f"🔧 Problème : {problem}\n"
-            f"🧠 Catégorie Du Problème : {problem_category}\n"
-            f"💡 Solution : {solution}\n"
-            f"📊 Statut   : {status_label}\n"
-            f"🛡️ Garantie : {warranty_label}\n"
-            f"📅 Date     : {created_at}"
-        ) if fr else (
-            f"📋 Here are your claim details:\n\n"
-            f"🔖 Claim ID  : {reclamation_id}\n"
-            f"💻 Product   : {product_ref}\n"
-            f"🔧 Problem   : {problem}\n"
-            f"🧠 Problem Category : {problem_category}\n"
-            f"💡 Solution  : {solution}\n"
-            f"📊 Status    : {status_label}\n"
-            f"🛡️ Warranty  : {warranty_label}\n"
-            f"📅 Date      : {created_at}"
-        )
+        # ── Message final avec résumé ─────────────────────────────
+        if fr:
+            msg = (
+                f"📋 Voici les détails de votre réclamation :\n\n"
+                f"🔖 Numéro   : {reclamation_id}\n"
+                f"💻 Produit  : {product_ref}\n"
+                f"🔧 Problème : {problem}\n"
+                f"🧠 Catégorie : {problem_category}\n"
+                f"💡 Solution : {solution}\n"
+                f"📊 Statut   : {status_label}\n"
+                f"🛡️ Garantie : {warranty_label}\n"
+                f"📅 Date     : {created_at}"
+            )
+            
+            # 🆕 Ajouter le résumé si disponible
+            if summary:
+                msg += f"\n\n📝 Résumé de la conversation :\n{summary}"
+            else:
+                logger.warning(f"⚠️ Aucun résumé disponible pour {reclamation_id}")
+                
+        else:
+            msg = (
+                f"📋 Here are your claim details:\n\n"
+                f"🔖 Claim ID  : {reclamation_id}\n"
+                f"💻 Product   : {product_ref}\n"
+                f"🔧 Problem   : {problem}\n"
+                f"🧠 Category  : {problem_category}\n"
+                f"💡 Solution  : {solution}\n"
+                f"📊 Status    : {status_label}\n"
+                f"🛡️ Warranty  : {warranty_label}\n"
+                f"📅 Date      : {created_at}"
+            )
+            
+            # 🆕 Ajouter le résumé si disponible
+            if summary:
+                msg += f"\n\n📝 Conversation Summary:\n{summary}"
+            else:
+                logger.warning(f"⚠️ No summary available for {reclamation_id}")
 
         return _close_with_session(event, msg, session_attributes)
 

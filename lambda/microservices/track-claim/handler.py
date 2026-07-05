@@ -52,6 +52,8 @@ def handler(event, context):
                 "sentiment":           complaint.get("sentiment", "N/A"),
                 "under_warranty":      complaint.get("underWarranty", False),
                 "created_at":          str(complaint.get("createdAt", "N/A"))[:10],
+                "summary":             complaint.get("summary", "")  # 🆕 AJOUTER LE RÉSUMÉ
+
             })
 
         # ── Action : Lister toutes les réclamations ───────────────

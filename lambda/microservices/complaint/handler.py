@@ -54,6 +54,9 @@ def handler(event, context):
             description    = body.get("description")
             under_warranty = body.get("under_warranty", False)
             ai_analysis    = body.get("ai_analysis", {})
+            summary        = body.get("summary", "")  # 🆕 RÉSUMÉ
+
+
 
             complaint_id = str(uuid.uuid4())
             created_at   = datetime.utcnow().isoformat()
@@ -70,6 +73,8 @@ def handler(event, context):
                  # ── IA Analysis ─────────────────────────────
                 "solution":       ai_analysis.get("solution", ""),
                 "sentiment":      ai_analysis.get("sentiment", "UNKNOWN"),
+                "summary":        summary,  # 🆕 AJOUTER LE RÉSUMÉ
+
 
                 # ✅ ML Classification
                 "problemCategory": ai_analysis.get("problem_category", "unknown"),
@@ -85,6 +90,8 @@ def handler(event, context):
             complaints_table.put_item(Item=item)
             logger.info(f"Réclamation enregistrée : {complaint_id}")
             logger.info(f"Sentiment : {ai_analysis.get('sentiment', 'UNKNOWN')}")
+            logger.info(f"📝 Résumé sauvegardé : {summary[:100] if summary else 'VIDE'}")  # 🆕 LOG
+
 
             return _response(200, {
                 "success":      True,
